@@ -406,9 +406,17 @@
 
                 const data = await response.json();
 
-                searchResult.innerHTML = "";
+               searchResult.innerHTML = "";
                 const rendered = formatMarkdown(data.answer);
                 searchResult.appendChild(rendered);
+
+                // Show generated diagram image if returned
+                if (data.diagram) {
+                    const img = document.createElement("img");
+                    img.src = "data:image/png;base64," + data.diagram;
+                    img.style.cssText = "width:100%;max-width:900px;border-radius:10px;margin-top:16px;display:block;";
+                    searchResult.appendChild(img);
+                }
 
                 searchImages = [];
                 selectedImagesPreview.innerHTML = "";

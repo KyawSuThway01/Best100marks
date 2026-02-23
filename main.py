@@ -3,6 +3,7 @@ import secrets
 import io
 import logging
 from datetime import datetime, timedelta
+from generate_aws_diagram import generate_aws_diagram
 
 from dotenv import load_dotenv
 from flask import (Flask, render_template, request, redirect, url_for,
@@ -324,11 +325,38 @@ SYSTEM_PROMPTS = {
     ),
 
     'd': (
-        'You are a system design and diagram assistant. '
-        'The user may send text or an image of a diagram or design question. '
-        'If asked to explain a diagram: describe each component and how they connect. '
-        'If asked to create a diagram: produce a clear ASCII or Mermaid diagram, then explain each part. '
-        'Use numbered steps to walk through any process or flow.'
+        'You are an expert AWS Solutions Architect and diagram assistant. '
+        'When the user asks to draw or create an AWS architecture diagram, always respond in this exact structure: '
+    
+        'PART 1 — ARCHITECTURE OVERVIEW: '
+        'List all AWS services used and explain the role of each one in one sentence. '
+    
+        'PART 2 — ASCII DIAGRAM: '
+        'Produce a clean ASCII diagram using box characters (+-|) and arrows (-->, v, /,\\) '
+        'showing all components and data flow. Label every arrow. '
+        'Layout rule: User on the far left, flow moves left to right, branches go top/bottom from Lambda. '
+    
+        'PART 3 — FINISHED DIAGRAM DESCRIPTION: '
+        'Describe exactly how the finished professional diagram should look as if it were a real image: '
+        'dark background, color-coded service cards (CloudFront=orange, S3=green, API Gateway=blue, '
+        'Lambda=red, DynamoDB=purple, Cognito=pink, SQS=yellow, CloudWatch=teal), '
+        'directional arrows with labels, AWS Region boundary box, legend at the bottom. '
+        'Tell the user they can recreate this in draw.io using AWS17 shape libraries. '
+    
+        'PART 4 — STEP-BY-STEP DRAWING INSTRUCTIONS (draw.io): '
+        'Give numbered steps: open draw.io, enable AWS17 shape library, '
+        'add each service icon in canvas order (left to right), '
+        'draw labeled arrows with exact label text for each connection, '
+        'style with matching colors per service category, add title and legend, export as PNG. '
+    
+        'PART 5 — HAND-DRAWN OPTION: '
+        'Repeat the ASCII layout as a drawing guide. Add tips: use ruler, label all boxes, '
+        'use colored pens per category, photograph in good lighting, crop before submitting. '
+    
+        'PART 6 — SUBMISSION CHECKLIST: '
+        'End with a markdown checklist table. '
+    
+        'Always use official AWS service names. Keep instructions beginner-friendly and numbered.'
     ),
 }
 
@@ -555,10 +583,16 @@ def ask():
     system_prompt = SYSTEM_PROMPTS[mode]
 
     # ── ROUTE: Claude for code, GPT for everything else ──────────────
-    if mode == 'c':
+    # ── ROUTE: Claude for code and diagrams, GPT for everything else ──
+    if mode in ('c', 'd'):
         answer = _ask_claude(system_prompt, question, images)
     else:
         answer = _ask_gpt(system_prompt, question, images, mode)
+
+        # For diagram mode, also generate and return the image
+    if mode == 'd':
+        diagram_b64 = generate_aws_diagram()
+        return jsonify({'answer': answer, 'diagram': diagram_b64})
 
     return jsonify({'answer': answer})
 
