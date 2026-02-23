@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Massey PowerPoint</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <script src="static/js/script.js"></script>
+
+    <style>
+        #modeSelector {
+            background-color: #1e1e1e;
+            color: white;
+            border: 1px solid #5a5a5a;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 13px;
+            cursor: pointer;
+            height: 28px;
+            outline: none;
+            flex-shrink: 0;
+        }
+        #modeSelector:focus { border-color: #0078d4; }
+        #modeSelector option { background-color: #2b2b2b; color: white; }
+        #mode-wrapper { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+        /* ── Answer content styling ── */
+        .answer-content h1 { font-size: 1.4em; font-weight: bold; margin: 12px 0 6px; }
+        .answer-content h2 { font-size: 1.2em; font-weight: bold; margin: 10px 0 5px; }
+        .answer-content h3 { font-size: 1.1em; font-weight: bold; margin: 8px 0 4px; }
+        .answer-content h4 { font-size: 1.0em; font-weight: bold; margin: 6px 0 3px; }
+        .answer-content ul  { padding-left: 20px; margin: 6px 0; list-style: disc; }
+        .answer-content ol  { padding-left: 20px; margin: 6px 0; list-style: decimal; }
+        .answer-content li  { margin: 3px 0; line-height: 1.5; }
+        .answer-content pre {
+            background: rgba(0, 0, 0, 0.04) !important;
+            color: inherit !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-top: none !important;
+            padding: 12px !important;
+            border-radius: 0 0 6px 6px !important;
+            overflow-x: auto;
+            margin: 0 0 8px 0;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .answer-content code {
+            background: rgba(0, 0, 0, 0.06) !important;
+            color: inherit !important;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .answer-content pre code {
+            background: none !important;
+            color: inherit !important;
+            padding: 0;
+        }
+        .answer-content .code-lang {
+            background: rgba(0, 0, 0, 0.06) !important;
+            color: inherit !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-bottom: none !important;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 6px 6px 0 0;
+            font-family: monospace;
+            display: block;
+            margin-top: 8px;
+        }
+        .answer-content p      { margin: 6px 0; line-height: 1.6; }
+        .answer-content strong { font-weight: bold; }
+        .answer-content em     { font-style: italic; }
+        .answer-content hr     { border: none; border-top: 1px solid #444; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar">
+        <div id="start">
+            <button class="toolbar-btn" id="sidenavToggle" title="Menu" aria-label="Menu" aria-expanded="false"></button>
+            <span id="title">Microsoft PowerPoint - Lecture-01-Introduction-to-Functional...</span>
+        </div>
+        <div id="middle">
+            <div class="page-selector">
+                <input type="text" class="page-input" value="1" aria-label="Current page">
+                <span class="page-total">/ 1</span>
+            </div>
+            <span class="vertical-separator"></span>
+            <div id="zoom-controls">
+                <button class="toolbar-btn icon-btn-remove" title="Zoom out" aria-label="Zoom out"></button>
+                <input type="text" class="zoom-input" value="100%" aria-label="Zoom level">
+                <button class="toolbar-btn icon-btn-add" title="Zoom in" aria-label="Zoom in"></button>
+            </div>
+            <span class="vertical-separator"></span>
+            <button class="toolbar-btn icon-btn-fit" id="fit" title="Fit to width" aria-label="Fit to width"></button>
+            <button class="toolbar-btn" id="rotate" title="Rotate" aria-label="Rotate">
+                <i class="bi bi-arrow-counterclockwise rotate-icon"></i>
+            </button>
+            <span class="vertical-separator"></span>
+            <button class="toolbar-btn icon-btn-annotate annotate-button" id="annotate" aria-label="Draw" title="Draw"></button>
+            <span class="vertical-separator"></span>
+            <button class="toolbar-btn icon-btn-undo" id="undo" aria-label="Undo" title="Undo" disabled></button>
+            <button class="toolbar-btn icon-btn-redo" id="redo" aria-label="Redo" title="Redo" disabled></button>
+        </div>
+        <div id="end">
+            <div id="mode-wrapper">
+                <select id="modeSelector" title="Select AI mode">
+                    <option value="m">m</option>
+                    <option value="b">b</option>
+                    <option value="q" selected>q</option>
+                    <option value="c">c</option>
+                    <option value="d">d</option>
+                </select>
+            </div>
+            <button class="toolbar-btn" title="Download"><i class="bi bi-download"></i></button>
+            <button class="toolbar-btn" title="Print"><i class="bi bi-printer"></i></button>
+            <button class="toolbar-btn icon-btn-more" title="More options"></button>
+
+            <!-- Hidden logout form — triggered by Shift+L -->
+            <form id="logoutForm" action="{{ url_for('logout') }}" method="POST" style="display:none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            </form>
+        </div>
+    </div>
+
+    <div id="document-viewer">
+        <div id="document-container">
+            <div class="document-page active" id="page-1">
+                <div class="placeholder">
+
+                    <div id="uploadSection">
+                        <!-- CSRF token on upload form -->
+                        <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="file" name="image" id="imageInput" required accept="image/png,image/jpeg,image/webp,image/gif">
+                        </form>
+                    </div>
+
+                    <div id="images-container">
+                        {% for image in images %}
+                        <div class="image-wrapper">
+                            <img src="{{ url_for('get_image', image_id=image.id) }}" alt="{{ image.filename }}">
+
+                            <!-- CSRF token on each delete form -->
+                            <form action="{{ url_for('delete', image_id=image.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="delete-btn">D</button>
+                            </form>
+                        </div>
+                        {% endfor %}
+
+                        <div id="searchResult" class="answer-box"></div>
+                    </div>
+
+                    <div id="search-container">
+                        <form id="searchForm">
+                            <div class="search-input-wrapper">
+                                <input type="text" id="searchInput" placeholder="..." required maxlength="4000">
+                                <input type="file" id="searchImageInput" accept="image/*" multiple style="display: none;">
+                                <button type="button" id="imageUploadBtn" class="image-upload-btn" title="Attach images"></button>
+                            </div>
+                            <div id="selectedImagesPreview" class="selected-images-preview"></div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Read CSRF token for fetch requests to /ask
+        const CSRF_TOKEN = "{{ csrf_token() }}";
+
+        const imageInput = document.getElementById("imageInput");
+        const uploadForm = document.getElementById("uploadForm");
+
+        imageInput.addEventListener("change", async function() {
+            if (this.files.length > 0) {
+                const formData = new FormData(uploadForm);
+                await fetch("/upload", { method: "POST", body: formData });
+                window.location.reload();
+            }
+        });
+
+        const uploadSection  = document.getElementById("uploadSection");
+        const deleteButtons  = document.querySelectorAll(".delete-btn");
+
+        document.addEventListener("keydown", function(event) {
+            if ((event.key === "u" || event.key === "U") && event.shiftKey) {
+                uploadSection.style.display = "block";
+            }
+            if (event.key === "d" || event.key === "D") {
+                deleteButtons.forEach(btn => btn.style.display = "inline-block");
+            }
+            if (event.key === "h" || event.key === "H") {
+                uploadSection.style.display = "none";
+                deleteButtons.forEach(btn => btn.style.display = "none");
+            }
+            if ((event.key === "l" || event.key === "L") && event.shiftKey) {
+                document.getElementById("logoutForm").submit();
+            }
+        });
+
+        const searchForm            = document.getElementById("searchForm");
+        const searchInput           = document.getElementById("searchInput");
+        const searchResult          = document.getElementById("searchResult");
+        const searchImageInput      = document.getElementById("searchImageInput");
+        const imageUploadBtn        = document.getElementById("imageUploadBtn");
+        const selectedImagesPreview = document.getElementById("selectedImagesPreview");
+        const modeSelector          = document.getElementById("modeSelector");
+
+        let searchImages = [];
+
+        imageUploadBtn.addEventListener("click", function() {
+            searchImageInput.click();
+        });
+
+        searchImageInput.addEventListener("change", function() {
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageData = e.target.result;
+                        if (searchImages.length >= 5) {
+                            alert("Maximum 5 images allowed.");
+                            return;
+                        }
+                        searchImages.push(imageData);
+
+                        const wrapper   = document.createElement("div");
+                        wrapper.className = "preview-image-wrapper";
+                        const img       = document.createElement("img");
+                        img.src = imageData;
+                        const removeBtn = document.createElement("button");
+                        removeBtn.className = "preview-remove-btn";
+                        removeBtn.innerHTML = "×";
+                        removeBtn.type = "button";
+                        removeBtn.onclick = function() {
+                            const idx = searchImages.indexOf(imageData);
+                            if (idx > -1) searchImages.splice(idx, 1);
+                            wrapper.remove();
+                        };
+                        wrapper.appendChild(img);
+                        wrapper.appendChild(removeBtn);
+                        selectedImagesPreview.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            this.value = "";
+        });
+
+        // ── Markdown formatter — returns a DOM element ────────────────────
+        function applyInline(text) {
+            return text
+                .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+                .replace(/\*\*(.+?)\*\*/g,     "<strong>$1</strong>")
+                .replace(/\*(.+?)\*/g,          "<em>$1</em>")
+                .replace(/`([^`]+)`/g,          '<span style="background:rgba(0,0,0,0.07);padding:2px 5px;border-radius:3px;font-family:monospace;font-size:13px;">$1</span>');
+        }
+
+        function formatMarkdown(raw) {
+            // 1. Extract code blocks
+            const codeBlocks = [];
+            raw = raw.replace(/```(\w+)?\n?([\s\S]*?)```/g, function(_, lang, code) {
+                const idx = codeBlocks.length;
+                codeBlocks.push({ lang: lang || "", code: code.trim() });
+                return `\n%%CB${idx}%%\n`;
+            });
+
+            const wrapper = document.createElement("div");
+            const lines = raw.split("\n");
+            let i = 0;
+
+            while (i < lines.length) {
+                const line = lines[i];
+
+                // Code block placeholder
+                const cbMatch = line.match(/^%%CB(\d+)%%$/);
+                if (cbMatch) {
+                    const { lang, code } = codeBlocks[parseInt(cbMatch[1])];
+                    const container = document.createElement("div");
+                    container.style.margin = "8px 0 12px 0";
+
+                    if (lang) {
+                        const label = document.createElement("div");
+                        label.textContent = lang;
+                        label.style.cssText = "font-size:11px;font-family:monospace;padding:3px 10px;border-radius:6px 6px 0 0;border:1px solid rgba(0,0,0,0.12);border-bottom:none;display:inline-block;";
+                        container.appendChild(label);
+                    }
+
+                    const block = document.createElement("div");
+                    block.style.backgroundColor = "rgba(0,0,0,0.04)";
+                    block.style.color           = "inherit";
+                    block.style.border          = "1px solid rgba(0,0,0,0.12)";
+                    block.style.borderRadius    = lang ? "0 6px 6px 6px" : "6px";
+                    block.style.padding         = "12px";
+                    block.style.fontFamily      = "monospace";
+                    block.style.fontSize        = "13px";
+                    block.style.lineHeight      = "1.6";
+                    block.style.overflowX       = "auto";
+                    block.style.whiteSpace      = "pre";
+                    block.style.display         = "block";
+                    block.textContent           = code;
+                    container.appendChild(block);
+                    wrapper.appendChild(container);
+                    i++; continue;
+                }
+
+                // Headers
+                if (/^#{1,6} /.test(line)) {
+                    const level = line.match(/^(#{1,6}) /)[1].length;
+                    const text  = line.replace(/^#{1,6} /, "");
+                    const sizes = ["1.5em","1.3em","1.15em","1.05em","1em","0.95em"];
+                    const el = document.createElement("div");
+                    el.style.cssText = `font-size:${sizes[level-1]};font-weight:bold;margin:10px 0 4px;`;
+                    el.innerHTML = applyInline(text);
+                    wrapper.appendChild(el);
+                    i++; continue;
+                }
+
+                // Bullet list
+                if (/^[-*] /.test(line)) {
+                    const ul = document.createElement("ul");
+                    ul.style.cssText = "padding-left:20px;margin:6px 0;list-style:disc;";
+                    while (i < lines.length && /^[-*] /.test(lines[i])) {
+                        const li = document.createElement("li");
+                        li.style.cssText = "margin:3px 0;line-height:1.5;";
+                        li.innerHTML = applyInline(lines[i].replace(/^[-*] /,"").trim());
+                        ul.appendChild(li);
+                        i++;
+                    }
+                    wrapper.appendChild(ul);
+                    continue;
+                }
+
+                // Numbered list
+                if (/^\d+\. /.test(line)) {
+                    const ol = document.createElement("ol");
+                    ol.style.cssText = "padding-left:20px;margin:6px 0;list-style:decimal;";
+                    while (i < lines.length && /^\d+\. /.test(lines[i])) {
+                        const li = document.createElement("li");
+                        li.style.cssText = "margin:3px 0;line-height:1.5;";
+                        li.innerHTML = applyInline(lines[i].replace(/^\d+\. /,"").trim());
+                        ol.appendChild(li);
+                        i++;
+                    }
+                    wrapper.appendChild(ol);
+                    continue;
+                }
+
+                // HR
+                if (/^---+$/.test(line.trim())) {
+                    const hr = document.createElement("hr");
+                    hr.style.cssText = "border:none;border-top:1px solid #ccc;margin:10px 0;";
+                    wrapper.appendChild(hr);
+                    i++; continue;
+                }
+
+                // Empty line
+                if (line.trim() === "") {
+                    wrapper.appendChild(document.createElement("br"));
+                    i++; continue;
+                }
+
+                // Normal text
+                const span = document.createElement("span");
+                span.style.lineHeight = "1.6";
+                span.innerHTML = applyInline(line);
+                wrapper.appendChild(span);
+                wrapper.appendChild(document.createElement("br"));
+                i++;
+            }
+
+            return wrapper;
+        }
+        // ────────────────────────────────────────────────────────────────────
+
+        searchForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const question = searchInput.value.trim();
+            if (!question) return;
+
+            const selectedMode = modeSelector.value;
+            searchResult.innerHTML = "T...";
+
+            try {
+                const response = await fetch("/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": CSRF_TOKEN
+                    },
+                    body: JSON.stringify({ question, images: searchImages, mode: selectedMode })
+                });
+
+                if (!response.ok) {
+                    searchResult.innerHTML = `<p><strong>Error:</strong> Server error (${response.status})</p>`;
+                    return;
+                }
+
+                const data = await response.json();
+
+                searchResult.innerHTML = "";
+                const rendered = formatMarkdown(data.answer);
+                searchResult.appendChild(rendered);
+
+                searchImages = [];
+                selectedImagesPreview.innerHTML = "";
+
+            } catch (error) {
+                searchResult.innerHTML = `<p><strong>Error:</strong> ${error.message}</p>`;
+            }
+        });
+
+        const searchContainer = document.getElementById("search-container");
+        document.addEventListener("keydown", function(event) {
+            if ((event.key === "s" || event.key === "S") && event.shiftKey) {
+                const isHidden = searchContainer.style.display === "none" || searchContainer.style.display === "";
+                searchContainer.style.display = isHidden ? "block" : "none";
+                if (isHidden) searchInput.focus();
+            }
+        });
+
+        document.addEventListener("paste", function(event) {
+            if (searchContainer.style.display === "none" || searchContainer.style.display === "") return;
+            const items = event.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    const file = items[i].getAsFile();
+                    if (!file) return;
+                    if (searchImages.length >= 5) { alert("Maximum 5 images allowed."); return; }
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageData = e.target.result;
+                        searchImages.push(imageData);
+                        const wrapper   = document.createElement("div");
+                        wrapper.className = "preview-image-wrapper";
+                        const img       = document.createElement("img");
+                        img.src = imageData;
+                        const removeBtn = document.createElement("button");
+                        removeBtn.className = "preview-remove-btn";
+                        removeBtn.innerHTML = "×";
+                        removeBtn.type = "button";
+                        removeBtn.onclick = function() {
+                            const idx = searchImages.indexOf(imageData);
+                            if (idx > -1) searchImages.splice(idx, 1);
+                            wrapper.remove();
+                        };
+                        wrapper.appendChild(img);
+                        wrapper.appendChild(removeBtn);
+                        selectedImagesPreview.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
